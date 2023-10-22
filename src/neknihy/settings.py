@@ -17,9 +17,9 @@ class Settings():
     def save(self):
         config = configparser.ConfigParser();
         config["settings"] = {
-            "email": self.email,
-            "password": self.password,
-            "workdir": self.workdir,
+            "email": self.email if type(self.email) is str else "",
+            "password": self.password if type(self.password) is str else "",
+            "workdir": self.workdir if type(self.workdir) is str else "",
         }
         with open(self._file_name(), "w") as cf:
             config.write(cf)
