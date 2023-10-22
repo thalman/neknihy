@@ -11,8 +11,6 @@ import threading
 import subprocess
 import sys
 
-from pprint import pprint
-
 from neknihy.app import App
 
 
@@ -34,9 +32,8 @@ class Neknihy():
         self._window.title("Neknihy")
         self._window.geometry("800x600")
         self._window.minsize(600,400)
-        # self._window.iconbitmap("./neknihy.ico")
-
-        # https://stackoverflow.com/questions/284234/notebook-widget-in-tkinter
+        self._icon = tk.PhotoImage(file='./resources/neknihy.png')
+        self._window.iconphoto(True, self._icon)
         nb = ttk.Notebook(self._window)
 
         p1 = ttk.Frame(nb)
