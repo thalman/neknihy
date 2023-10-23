@@ -10,7 +10,7 @@ import tkinter.filedialog
 import threading
 import subprocess
 import sys
-from os import path
+import os
 
 from neknihy.app import App
 
@@ -30,19 +30,20 @@ class Neknihy():
 
     def _resources_folder(self):
         for resources in [
-                path.join(path.abspath(path.dirname(__file__)), 'resources'),
+                os.path.join(os.path.abspath(os.path.dirname(__file__)), 'resources'),
                 'resources',
                 ]:
-            if path.exists(resources):
+            if os.path.exists(resources):
                 return resources
         raise RuntimeError("Resource directory not found")
+
     def createGUI(self):
         resources = self._resources_folder()
         self._window = tk.Tk()
         self._window.title("Neknihy")
         self._window.geometry("800x600")
-        self._window.minsize(600,400)
-        self._icon = tk.PhotoImage(file=path.join(resources, 'neknihy.png'))
+        self._window.minsize(600, 400)
+        self._icon = tk.PhotoImage(file=os.path.join(resources, 'neknihy.png'))
         self._window.iconphoto(True, self._icon)
         nb = ttk.Notebook(self._window)
 
@@ -58,12 +59,12 @@ class Neknihy():
         toolbar = ttk.Frame(p1)
         toolbar.pack(fill=tk.X)
 
-        self._img_cancel = tk.PhotoImage(file=path.join(resources, "cancel.png"))
-        self._img_refresh = tk.PhotoImage(file=path.join(resources, "refresh.png"))
-        self._img_download = tk.PhotoImage(file=path.join(resources, "download.png"))
-        self._img_return = tk.PhotoImage(file=path.join(resources, "return.png"))
-        self._img_open = tk.PhotoImage(file=path.join(resources, "open.png"))
-        self._img_open_small = self._img_open.subsample(2,2)
+        self._img_cancel = tk.PhotoImage(file=os.path.join(resources, "cancel.png"))
+        self._img_refresh = tk.PhotoImage(file=os.path.join(resources, "refresh.png"))
+        self._img_download = tk.PhotoImage(file=os.path.join(resources, "download.png"))
+        self._img_return = tk.PhotoImage(file=os.path.join(resources, "return.png"))
+        self._img_open = tk.PhotoImage(file=os.path.join(resources, "open.png"))
+        self._img_open_small = self._img_open.subsample(2, 2)
 
         self._toolbarButtons = []
         button = ttk.Button(toolbar, image=self._img_cancel)
@@ -119,9 +120,13 @@ class Neknihy():
 
     def onSelectFolder(self):
         dir = self._workdir.get()
-        name = tk.filedialog.askdirectory(title="Vyberte složku pro knihy", initialdir=dir, mustexist=True)
+        name = tk.filedialog.askdirectory(
+            title="Vyberte složku pro knihy",
+            initialdir=dir,
+            mustexist=True)
         if name != "":
             self._workdir.set(name)
+
     def sensitiveToolbar(self, sensitive):
         self._toolbarButtons[0]['state'] = DISABLED if sensitive else NORMAL
         for i in range(1, len(self._toolbarButtons)):
@@ -197,7 +202,7 @@ class Neknihy():
         if sys.platform == "win32":
             os.startfile(wd)
         else:
-            opener ="open" if sys.platform == "darwin" else "xdg-open"
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
             subprocess.call([opener, wd])
 
     def onTabSwitch(self, data):
@@ -209,6 +214,7 @@ class Neknihy():
 
     def onCancelJob(self, button):
         pass
+
 
 if __name__ == '__main__':
     Neknihy().run()

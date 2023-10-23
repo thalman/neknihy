@@ -4,13 +4,11 @@ import gi
 import threading
 import subprocess
 import sys
+import os
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib
-from gi.repository import GObject
-
-from pprint import pprint
 
 from neknihy.app import App
 
@@ -71,6 +69,7 @@ class Neknihy():
                     book["end_time"].split("T")[0] if "end_time" in book else "",
                     book["neknihy"]["status"] if "neknihy" in book else ""
                 ])
+
     def run(self):
         Gtk.main()
 
@@ -109,7 +108,6 @@ class Neknihy():
             dialog.destroy()
             self.error = None
 
-
     def onRefreshBooks(self, button):
         self.sensitiveToolbar(False)
         self.background_task = threading.Thread(target=self.refreshBooks)
@@ -136,7 +134,7 @@ class Neknihy():
         if sys.platform == "win32":
             os.startfile(wd)
         else:
-            opener ="open" if sys.platform == "darwin" else "xdg-open"
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
             subprocess.call([opener, wd])
 
     def onTabSwitch(self, *notused):
@@ -148,6 +146,7 @@ class Neknihy():
 
     def onCancelJob(self, button):
         pass
+
 
 if __name__ == '__main__':
     Neknihy().run()

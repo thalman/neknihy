@@ -3,32 +3,33 @@ import configparser
 
 try:
     import platformdirs
-except:
+except ModuleNotFoundError:
     try:
         from gi.repository import GLib
-    except:
+    except ModuleNotFoundError:
         pass
+
 
 class Settings():
     def _file_name(self):
         try:
             return os.path.join(GLib.get_user_config_dir(), "neknihy.conf")
-        except:
+        except NameError:
             pass
         try:
             return os.path.join(platformdirs.user_config_dir(), "neknihy.conf")
-        except:
+        except NameError:
             return os.path.join(os.path.expanduser('~'), ".neknihy.conf")
 
     def load(self):
-        config = configparser.ConfigParser();
+        config = configparser.ConfigParser()
         config.read(self._file_name())
         self.email = config.get("settings", "email", fallback="")
         self.password = config.get("settings", "password", fallback="")
         self.workdir = config.get("settings", "workdir", fallback="")
 
     def save(self):
-        config = configparser.ConfigParser();
+        config = configparser.ConfigParser()
         config["settings"] = {
             "email": self.email if type(self.email) is str else "",
             "password": self.password if type(self.password) is str else "",

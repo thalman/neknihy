@@ -5,6 +5,7 @@ import os.path
 import json
 from datetime import datetime, timezone
 
+
 class App():
     def __init__(self):
         self.api = API()
@@ -14,32 +15,35 @@ class App():
         self.loadBooks()
 
     def updateSettings(self, email, password, workdir):
-        self.settings.update(email, password, workdir);
+        self.settings.update(email, password, workdir)
         self.api.logout()
 
     def saveBooks(self):
-        if not self.settings.configured(): return
+        if not self.settings.configured():
+            return
         file = os.path.join(self.settings.workdir, '.data')
         with open(file, 'w') as f:
             json.dump(self.books, f, indent=2)
 
     def loadBooks(self):
         try:
-            if not self.settings.configured(): return
+            if not self.settings.configured():
+                return
             file = os.path.join(self.settings.workdir, '.data')
             with open(file) as f:
                 self.books = json.load(f)
             self.updateStatus()
-        except:
+        except Exception:
             self.books = []
 
     def refreshRents(self):
-        if not self.settings.configured(): return
+        if not self.settings.configured():
+            return
         self.api.login(self.settings.email, self.settings.password)
         rents = self.api.getListOfRentedBooks()
         for rent in rents:
             if self.bookIndexByPalmId(rent["palm_id"]) is None:
-                rent["neknihy"] = { "status": "new", "filename": "" }
+                rent["neknihy"] = {"status": "new", "filename": ""}
                 self.books.append(rent)
         self.saveBooks()
         self.updateStatus()
@@ -53,7 +57,7 @@ class App():
                     if time < datetime.now(timezone.utc) and book["neknihy"]["status"] != "expired":
                         book["neknihy"]["status"] = "expired"
                         changed = True
-            except:
+            except Exception:
                 pass
         if changed:
             self.saveBooks()
@@ -65,7 +69,8 @@ class App():
         return None
 
     def book(self, index):
-        if index >= len(self.books): return None
+        if index >= len(self.books):
+            return None
         return self.books[index]
 
     def bookFile(self, index):
@@ -98,7 +103,8 @@ class App():
         self.api.downloadBook(self.settings.workdir, self.books[index])
 
     def downloadBooks(self):
-        if not self.settings.configured(): return
+        if not self.settings.configured():
+            return
         self.api.login(self.settings.email, self.settings.password)
         for i in range(len(self.books)):
             if not self.bookDownloaded(i):

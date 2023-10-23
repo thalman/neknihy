@@ -3,7 +3,6 @@ import json
 import urllib
 import os.path
 
-from pprint import pprint
 
 class API():
     def __init__(self):
@@ -12,10 +11,13 @@ class API():
         self._rents = None
 
     def login(self, email, password):
-        if self._login: return
+        if self._login:
+            return
         data = {"email": email, "password": password}
         headers = {"Content-Type": "application/json", "Accept": "application/json"}
-        response = requests.post(self._url + "/users/login/", data=json.dumps(data), headers=headers)
+        response = requests.post(self._url + "/users/login/",
+                                 data=json.dumps(data),
+                                 headers=headers)
         if response.status_code >= 300:
             raise RuntimeError("Nepodařilo se přihlásit, zkontrolujte jméno a heslo")
         self._login = json.loads(response.text)
@@ -45,7 +47,8 @@ class API():
             "Content-Type": "application/json",
             "Authorization": "Bearer " + self._login["token"]
         }
-        url = self._url + "/v3/books/file/" + str(book["palm_id"]) + "/" + str(book["variant_palm_id"]) + "/"
+        url = (self._url + "/v3/books/file/" + str(book["palm_id"]) + "/" +
+               str(book["variant_palm_id"]) + "/")
         response = requests.get(url, headers=headers)
         if response.status_code >= 300:
             raise RuntimeError("Nepodařilo se získat odkaz ke stažení výpujčky")
@@ -54,10 +57,10 @@ class API():
     def downloadBook(self, workdir, book):
         downloadInfo = self.getRentDownloadInfo(book)
         if not downloadInfo["status"]:
-            book["neknihy"] = {"status": "pending", "filename" : "" }
+            book["neknihy"] = {"status": "pending", "filename": ""}
             return
         info = downloadInfo["file"]
-        params = urllib.parse.parse_qs(info.split('?',1)[1])
+        params = urllib.parse.parse_qs(info.split('?', 1)[1])
 
         ext = ".unknown"
         if book["item_type"] == "ebook":
@@ -76,4 +79,4 @@ class API():
                     f.write(chunk)
         if response.status_code >= 300:
             raise RuntimeError("Nepodařilo se stáhnout knihu %s" % filename)
-        book["neknihy"] = { "status": "ok", "filename": filename }
+        book["neknihy"] = {"status": "ok", "filename": filename}
