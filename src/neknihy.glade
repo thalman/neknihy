@@ -40,7 +40,7 @@
                   <object class="GtkToolButton" id="refreshButton">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="tooltip-text" translatable="yes">Načíst nové výpujčky</property>
+                    <property name="tooltip-text" translatable="yes">Načíst nové výpůjčky</property>
                     <property name="label" translatable="yes">Obnovit seznam</property>
                     <property name="use-underline">True</property>
                     <property name="stock-id">gtk-refresh</property>
@@ -70,7 +70,7 @@
                   <object class="GtkToolButton" id="returnButton">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="tooltip-text" translatable="yes">Smazat knihy, u kterých vypršela výpujční doba</property>
+                    <property name="tooltip-text" translatable="yes">Smazat knihy, u kterých vypršela výpůjční doba</property>
                     <property name="label" translatable="yes">Vrátit knihy</property>
                     <property name="use-underline">True</property>
                     <property name="stock-id">gtk-undo</property>
