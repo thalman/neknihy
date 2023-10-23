@@ -23,6 +23,8 @@ class Neknihy():
         self.app.updateStatus()
         self.background_task = None
         self.error = None
+        self._tooltip_job = None
+        self._tooltip_window = None
         self._email.set(self.app.settings.email)
         self._password.set(self.app.settings.password)
         self._workdir.set(self.app.settings.workdir)
@@ -36,6 +38,32 @@ class Neknihy():
             if os.path.exists(resources):
                 return resources
         raise RuntimeError("Resource directory not found")
+
+    def schedule_tooltip(self, event, tip):
+        self._tooltip_job = self._window.after(1000, lambda: self.show_tooltip(tip))
+
+    def show_tooltip(self, tip):
+        self._tooltip_window = tk.Toplevel(self._window)
+        tooltip_label = tk.Label(self._tooltip_window,
+                                 text=tip)
+        tooltip_label.pack()
+        self._tooltip_window.overrideredirect(True)
+        x = self._window.winfo_pointerx() + 15
+        y = self._window.winfo_pointery() + 15
+        self._tooltip_window.geometry("+{}+{}".format(x, y))
+        self._tooltip_job = None
+
+    def hide_tooltip(self, event):
+        if self._tooltip_job:
+            self._window.after_cancel(self._tooltip_job)
+            self._tooltip_job = None
+        if self._tooltip_window:
+            self._tooltip_window.destroy()
+            self._tooltip_window = None
+
+    def addTooltip(self, button, tip):
+        button.bind("<Enter>", lambda x: self.schedule_tooltip(x, tip))
+        button.bind("<Leave>", self.hide_tooltip)
 
     def createGUI(self):
         resources = self._resources_folder()
@@ -71,17 +99,25 @@ class Neknihy():
         button.pack(side="right", padx=5, pady=5)
         button['state'] = DISABLED
         self._toolbarButtons.append(button)
+
         button = ttk.Button(toolbar, image=self._img_refresh, command=self.onRefreshBooks)
         button.pack(side="left", padx=5, pady=5)
+        self.addTooltip(button, "Načíst nové výpůjčky")
         self._toolbarButtons.append(button)
+
         button = ttk.Button(toolbar, image=self._img_download, command=self.onDownloadBooks)
         button.pack(side="left", padx=5, pady=5)
+        self.addTooltip(button, "Stáhnout nově zapůjčené knihy")
         self._toolbarButtons.append(button)
+
         button = ttk.Button(toolbar, image=self._img_return, command=self.onReturnBooks)
         button.pack(side="left", padx=5, pady=5)
+        self.addTooltip(button, "Smazat knihy, u kterých\nvypršela výpůjční doba")
         self._toolbarButtons.append(button)
+
         button = ttk.Button(toolbar, image=self._img_open, command=self.onShowBooks)
         button.pack(side="left", padx=5, pady=5)
+        self.addTooltip(button, "Otevřít složku s knihami")
         self._toolbarButtons.append(button)
 
         # https://www.pythontutorial.net/tkinter/tkinter-treeview/
