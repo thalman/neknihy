@@ -30,7 +30,7 @@ Stáhnete si aplikaci na disk a spusťte ji
 
     git clone git@github.com:thalman/neknihy.git
     cd neknihy/src
-    ./neknihy-tk.py
+    ./neknihy.py
 
 ## Screenshot
 

@@ -1,11 +1,24 @@
 import os.path
 import configparser
-from gi.repository import GLib
 
+try:
+    import platformdirs
+except:
+    try:
+        from gi.repository import GLib
+    except:
+        pass
 
 class Settings():
     def _file_name(self):
-        return os.path.join(GLib.get_user_config_dir(), "neknihy.conf")
+        try:
+            return os.path.join(GLib.get_user_config_dir(), "neknihy.conf")
+        except:
+            pass
+        try:
+            return os.path.join(platformdirs.user_config_dir(), "neknihy.conf")
+        except:
+            return os.path.join(os.path.expanduser('~'), ".neknihy.conf")
 
     def load(self):
         config = configparser.ConfigParser();
