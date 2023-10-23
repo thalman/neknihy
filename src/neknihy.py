@@ -10,6 +10,7 @@ import tkinter.filedialog
 import threading
 import subprocess
 import sys
+from os import path
 
 from neknihy.app import App
 
@@ -27,12 +28,21 @@ class Neknihy():
         self._workdir.set(self.app.settings.workdir)
         self.updateBookList()
 
+    def _resources_folder(self):
+        for resources in [
+                path.join(path.abspath(path.dirname(__file__)), 'resources'),
+                'resources',
+                ]:
+            if path.exists(resources):
+                return resources
+        raise RuntimeError("Resource directory not found")
     def createGUI(self):
+        resources = self._resources_folder()
         self._window = tk.Tk()
         self._window.title("Neknihy")
         self._window.geometry("800x600")
         self._window.minsize(600,400)
-        self._icon = tk.PhotoImage(file='./resources/neknihy.png')
+        self._icon = tk.PhotoImage(file=path.join(resources, 'neknihy.png'))
         self._window.iconphoto(True, self._icon)
         nb = ttk.Notebook(self._window)
 
@@ -48,11 +58,11 @@ class Neknihy():
         toolbar = ttk.Frame(p1)
         toolbar.pack(fill=tk.X)
 
-        self._img_cancel = tk.PhotoImage(file="./resources/cancel.png")
-        self._img_refresh = tk.PhotoImage(file="./resources/refresh.png")
-        self._img_download = tk.PhotoImage(file="./resources/download.png")
-        self._img_return = tk.PhotoImage(file="./resources/return.png")
-        self._img_open = tk.PhotoImage(file="./resources/open.png")
+        self._img_cancel = tk.PhotoImage(file=path.join(resources, "cancel.png"))
+        self._img_refresh = tk.PhotoImage(file=path.join(resources, "refresh.png"))
+        self._img_download = tk.PhotoImage(file=path.join(resources, "download.png"))
+        self._img_return = tk.PhotoImage(file=path.join(resources, "return.png"))
+        self._img_open = tk.PhotoImage(file=path.join(resources, "open.png"))
         self._img_open_small = self._img_open.subsample(2,2)
 
         self._toolbarButtons = []
