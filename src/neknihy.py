@@ -3,7 +3,7 @@
 
 import tkinter as tk
 from tkinter import ttk
-from tkinter.messagebox import showinfo, WARNING
+from tkinter.messagebox import showinfo, WARNING, INFO
 from tkinter.constants import DISABLED, NORMAL
 import tkinter.filedialog
 
@@ -28,6 +28,7 @@ class Neknihy():
         self._email.set(self.app.settings.email)
         self._password.set(self.app.settings.password)
         self._workdir.set(self.app.settings.workdir)
+        self._readerdir.set(self.app.settings.readerdir)
         self.updateBookList()
 
     def _resources_folder(self):
@@ -92,6 +93,7 @@ class Neknihy():
         self._img_download = tk.PhotoImage(file=os.path.join(resources, "download.png"))
         self._img_return = tk.PhotoImage(file=os.path.join(resources, "return.png"))
         self._img_open = tk.PhotoImage(file=os.path.join(resources, "open.png"))
+        self._img_to_reader = tk.PhotoImage(file=os.path.join(resources, "toreader.png"))
         self._img_open_small = self._img_open.subsample(2, 2)
 
         self._toolbarButtons = []
@@ -113,6 +115,11 @@ class Neknihy():
         button = ttk.Button(toolbar, image=self._img_return, command=self.onReturnBooks)
         button.pack(side="left", padx=5, pady=5)
         self.addTooltip(button, "Smazat knihy, u kterých\nvypršela výpůjční doba")
+        self._toolbarButtons.append(button)
+
+        button = ttk.Button(toolbar, image=self._img_to_reader, command=self.onSyncReader)
+        button.pack(side="left", padx=5, pady=5)
+        self.addTooltip(button, "Synchronizovat výpůjčky s čtečkou")
         self._toolbarButtons.append(button)
 
         button = ttk.Button(toolbar, image=self._img_open, command=self.onShowBooks)
@@ -140,6 +147,8 @@ class Neknihy():
         label.grid(column=0, row=1, sticky=tk.EW, padx=5, pady=5)
         label = ttk.Label(p2, text="Pracovní složka")
         label.grid(column=0, row=2, sticky=tk.EW, padx=5, pady=5)
+        label = ttk.Label(p2, text="Složka ve čtečce")
+        label.grid(column=0, row=3, sticky=tk.EW, padx=5, pady=5)
 
         self._email = tk.StringVar()
         entry = ttk.Entry(p2, textvariable=self._email)
@@ -154,6 +163,13 @@ class Neknihy():
         button = ttk.Button(p2, image=self._img_open_small, command=self.onSelectFolder)
         button.grid(column=2, row=2, padx=5, pady=0)
 
+        self._readerdir = tk.StringVar()
+        entry = ttk.Entry(p2, textvariable=self._readerdir)
+        entry.grid(column=1, row=3, sticky=tk.EW, padx=5, pady=5)
+
+        button = ttk.Button(p2, image=self._img_open_small, command=self.onSelectReaderFolder)
+        button.grid(column=2, row=3, padx=5, pady=0)
+
     def onSelectFolder(self):
         dir = self._workdir.get()
         name = tk.filedialog.askdirectory(
@@ -162,6 +178,15 @@ class Neknihy():
             mustexist=True)
         if name != "":
             self._workdir.set(name)
+
+    def onSelectReaderFolder(self):
+        dir = self._readerdir.get()
+        name = tk.filedialog.askdirectory(
+            title="Vyberte složku pro knihy",
+            initialdir=dir,
+            mustexist=False)
+        if name != "":
+            self._readerdir.set(name)
 
     def sensitiveToolbar(self, sensitive):
         self._toolbarButtons[0]['state'] = DISABLED if sensitive else NORMAL
@@ -233,6 +258,20 @@ class Neknihy():
         self.app.returnBooks()
         self.updateBookList()
 
+    def onSyncReader(self):
+        result = self.app.syncReader()
+        if result is not None:
+            showinfo(
+                title='Nahráno',
+                icon=INFO,
+                message=(
+                    "Přidáno/odstraněno/zůstává ve čtečce: %i/%i/%i" % (
+                        len(result["added"]),
+                        len(result["removed"]),
+                        result["total"])
+                )
+            )
+
     def onShowBooks(self):
         wd = self._workdir.get()
         if sys.platform == "win32":
@@ -245,7 +284,8 @@ class Neknihy():
         self.app.updateSettings(
             self._email.get(),
             self._password.get(),
-            self._workdir.get()
+            self._workdir.get(),
+            self._readerdir.get()
         )
 
     def onCancelJob(self, button):

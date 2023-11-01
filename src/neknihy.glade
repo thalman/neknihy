@@ -82,6 +82,21 @@
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkToolButton" id="syncReader">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="tooltip-text" translatable="yes">Synchronizovat výpůjčky s čtečkou</property>
+                    <property name="label" translatable="yes">Do čtečky</property>
+                    <property name="use-underline">True</property>
+                    <property name="stock-id">gtk-redo</property>
+                    <signal name="clicked" handler="onSyncReader" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="homogeneous">True</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkToolButton" id="openBooks">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -143,6 +158,9 @@
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="enable-grid-lines">both</property>
+                        <child internal-child="selection">
+                          <object class="GtkTreeSelection"/>
+                        </child>
                       </object>
                     </child>
                   </object>
@@ -167,7 +185,7 @@
           </packing>
         </child>
         <child>
-          <!-- n-columns=2 n-rows=3 -->
+          <!-- n-columns=2 n-rows=4 -->
           <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
@@ -250,6 +268,29 @@
               <packing>
                 <property name="left-attach">1</property>
                 <property name="top-attach">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkFileChooserButton" id="settingsReaderDir">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="action">select-folder</property>
+                <property name="title" translatable="yes"/>
+              </object>
+              <packing>
+                <property name="left-attach">1</property>
+                <property name="top-attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkAccelLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Složka ve čtečce</property>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">3</property>
               </packing>
             </child>
           </object>

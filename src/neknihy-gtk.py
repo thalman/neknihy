@@ -36,6 +36,8 @@ class Neknihy():
         self._password.set_text(self.app.settings.password)
         self._workdir = self.builder.get_object("settingsWorkDir")
         self._workdir.set_current_folder(self.app.settings.workdir)
+        self._readerdir = self.builder.get_object("settingsReaderDir")
+        self._readerdir.set_current_folder(self.app.settings.readerdir)
         self._bookTreeView = self.builder.get_object("bookTreeView")
 
         self._toolbarButtons = []
@@ -78,7 +80,8 @@ class Neknihy():
         self.app.updateSettings(
             self._email.get_text(),
             self._password.get_text(),
-            self._workdir.get_current_folder()
+            self._workdir.get_current_folder(),
+            self._readerdir.get_current_folder()
         )
         Gtk.main_quit()
 
@@ -130,6 +133,25 @@ class Neknihy():
         self.app.returnBooks()
         self.updateBookList()
 
+    def onSyncReader(self, button):
+        result = self.app.syncReader()
+        if result is not None:
+            dialog = Gtk.MessageDialog(
+                transient_for=self._window,
+                flags=0,
+                message_type=Gtk.MessageType.INFO,
+                buttons=Gtk.ButtonsType.OK,
+                text="Nahráno do čtečky",
+            )
+            dialog.format_secondary_text(
+                "Přidáno/odstraněno/zůstává ve čtečce: %i/%i/%i" % (
+                    len(result["added"]),
+                    len(result["removed"]),
+                    result["total"])
+            )
+            dialog.run()
+            dialog.destroy()
+
     def onShowBooks(self, button):
         wd = self._workdir.get_current_folder()
         if sys.platform == "win32":
@@ -142,7 +164,8 @@ class Neknihy():
         self.app.updateSettings(
             self._email.get_text(),
             self._password.get_text(),
-            self._workdir.get_current_folder()
+            self._workdir.get_current_folder(),
+            self._readerdir.get_current_folder()
         )
 
     def onCancelJob(self, button):

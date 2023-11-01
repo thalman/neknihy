@@ -4,6 +4,7 @@ from neknihy.settings import Settings
 import os.path
 import json
 from datetime import datetime, timezone
+from shutil import copy
 
 
 class App():
@@ -14,8 +15,8 @@ class App():
         self.books = []
         self.loadBooks()
 
-    def updateSettings(self, email, password, workdir):
-        self.settings.update(email, password, workdir)
+    def updateSettings(self, email, password, workdir, readerdir):
+        self.settings.update(email, password, workdir, readerdir)
         self.api.logout()
 
     def saveBooks(self):
@@ -121,3 +122,33 @@ class App():
                 books.append(self.books[i])
         self.books = books
         self.saveBooks()
+
+    def bookByFilename(self, filename):
+        for i in range(len(self.books)):
+            if filename == self.books[i]["neknihy"]["filename"]:
+                return i
+        return None
+
+    def syncReader(self):
+        if self.settings.readerdir == "":
+            return None
+        if not os.path.exists(self.settings.readerdir):
+            return None
+        result = {"added": [], "removed": [], "total": 0}
+        for i in range(len(self.books)):
+            if self.books[i]["neknihy"]["status"] == "ok":
+                src = self.bookFile(i)
+                dst = os.path.join(
+                    self.settings.readerdir,
+                    self.books[i]["neknihy"]["filename"]
+                )
+                if os.path.exists(src) and not os.path.exists(dst):
+                    copy(src, dst)
+                    result["added"].append(self.books[i]["neknihy"]["filename"])
+                result["total"] += 1
+        for fn in os.listdir(self.settings.readerdir):
+            if fn.lower().endswith("-palmknihy.epub"):
+                if self.bookByFilename(fn) is None:
+                    os.remove(os.path.join(self.settings.readerdir, fn))
+                    result["removed"].append(fn)
+        return result

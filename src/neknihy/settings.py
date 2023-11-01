@@ -27,6 +27,7 @@ class Settings():
         self.email = config.get("settings", "email", fallback="")
         self.password = config.get("settings", "password", fallback="")
         self.workdir = config.get("settings", "workdir", fallback="")
+        self.readerdir = config.get("settings", "readerdir", fallback="")
 
     def save(self):
         config = configparser.ConfigParser()
@@ -34,11 +35,12 @@ class Settings():
             "email": self.email if type(self.email) is str else "",
             "password": self.password if type(self.password) is str else "",
             "workdir": self.workdir if type(self.workdir) is str else "",
+            "readerdir": self.readerdir if type(self.readerdir) is str else "",
         }
         with open(self._file_name(), "w") as cf:
             config.write(cf)
 
-    def update(self, email, password, workdir):
+    def update(self, email, password, workdir, readerdir):
         change = False
         if self.email != email:
             self.email = email
@@ -48,6 +50,9 @@ class Settings():
             change = True
         if self.workdir != workdir:
             self.workdir = workdir
+            change = True
+        if self.readerdir != readerdir:
+            self.readerdir = readerdir
             change = True
         if change:
             self.save()
