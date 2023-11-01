@@ -31,7 +31,7 @@ class Neknihy():
         self._readerdir.set(self.app.settings.readerdir)
         self.updateBookList()
 
-    def _resources_folder(self):
+    def _resourcesFolder(self):
         for resources in [
                 os.path.join(os.path.abspath(os.path.dirname(__file__)), 'resources'),
                 'resources',
@@ -40,10 +40,10 @@ class Neknihy():
                 return resources
         raise RuntimeError("Resource directory not found")
 
-    def schedule_tooltip(self, event, tip):
-        self._tooltip_job = self._window.after(1000, lambda: self.show_tooltip(tip))
+    def _scheduleTooltip(self, event, tip):
+        self._tooltip_job = self._window.after(1000, lambda: self._showTooltip(tip))
 
-    def show_tooltip(self, tip):
+    def _showTooltip(self, tip):
         self._tooltip_window = tk.Toplevel(self._window)
         tooltip_label = tk.Label(self._tooltip_window,
                                  text=tip)
@@ -54,7 +54,7 @@ class Neknihy():
         self._tooltip_window.geometry("+{}+{}".format(x, y))
         self._tooltip_job = None
 
-    def hide_tooltip(self, event):
+    def _hideTooltip(self, event):
         if self._tooltip_job:
             self._window.after_cancel(self._tooltip_job)
             self._tooltip_job = None
@@ -63,11 +63,11 @@ class Neknihy():
             self._tooltip_window = None
 
     def addTooltip(self, button, tip):
-        button.bind("<Enter>", lambda x: self.schedule_tooltip(x, tip))
-        button.bind("<Leave>", self.hide_tooltip)
+        button.bind("<Enter>", lambda x: self._scheduleTooltip(x, tip))
+        button.bind("<Leave>", self._hideTooltip)
 
     def createGUI(self):
-        resources = self._resources_folder()
+        resources = self._resourcesFolder()
         self._window = tk.Tk()
         self._window.title("Neknihy")
         self._window.geometry("800x600")
