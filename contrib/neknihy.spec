@@ -1,3 +1,6 @@
+#
+# build command: rpmbuild -ba neknihy.spec -D "SRCVERSION x.y.z"
+#
 Name:           neknihy
 Version:        %{SRCVERSION}
 Release:        1%{?dist}
@@ -14,7 +17,7 @@ Requires:       python3-gobject
 Simple desktop client to PalmKnihy web rental system.
 
 %prep
-%setup -q -n neknihy
+%setup -q
 
 %build
 true
