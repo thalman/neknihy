@@ -21,8 +21,9 @@ class Neknihy():
 
         self.app = App()
         self.app.updateStatus()
-        self.background_task = None
-        self.error = None
+        self._background_task = None
+        self._error = None
+        self._message = None
         self._tooltip_job = None
         self._tooltip_window = None
         self._email.set(self.app.settings.email)
@@ -30,6 +31,7 @@ class Neknihy():
         self._workdir.set(self.app.settings.workdir)
         self._readerdir.set(self.app.settings.readerdir)
         self.updateBookList()
+        self.syncButtonMonitor()
 
     def _resourcesFolder(self):
         for resources in [
@@ -85,6 +87,7 @@ class Neknihy():
         nb.pack(expand=1, fill="both")
         nb.bind("<<NotebookTabChanged>>", self.onTabSwitch)
 
+        # application page
         toolbar = ttk.Frame(p1)
         toolbar.pack(fill=tk.X)
 
@@ -117,17 +120,16 @@ class Neknihy():
         self.addTooltip(button, "Smazat knihy, u kterých\nvypršela výpůjční doba")
         self._toolbarButtons.append(button)
 
-        button = ttk.Button(toolbar, image=self._img_to_reader, command=self.onSyncReader)
-        button.pack(side="left", padx=5, pady=5)
-        self.addTooltip(button, "Synchronizovat výpůjčky s čtečkou")
-        self._toolbarButtons.append(button)
+        self._sync_button = ttk.Button(toolbar,
+                                       image=self._img_to_reader,
+                                       command=self.onSyncReader)
+        self._sync_button.pack(side="left", padx=5, pady=5)
+        self.addTooltip(self._sync_button, "Synchronizovat výpůjčky s čtečkou")
 
         button = ttk.Button(toolbar, image=self._img_open, command=self.onShowBooks)
         button.pack(side="left", padx=5, pady=5)
         self.addTooltip(button, "Otevřít složku s knihami")
-        self._toolbarButtons.append(button)
 
-        # https://www.pythontutorial.net/tkinter/tkinter-treeview/
         columns = ("author", "book", "rent", "status")
         tree = ttk.Treeview(p1, columns=columns, show='headings')
         tree.pack(fill=tk.BOTH, expand=True)
@@ -137,7 +139,7 @@ class Neknihy():
         tree.heading("status", text='Stav')
         self._tree = tree
 
-        # settings
+        # settings page
         p2.columnconfigure(0, weight=1)
         p2.columnconfigure(1, weight=100)
         p2.columnconfigure(2, weight=1)
@@ -188,10 +190,23 @@ class Neknihy():
         if name != "":
             self._readerdir.set(name)
 
+    def sensitiveSyncButton(self, sensitive):
+        if self._background_task is not None:
+            self._sync_button['state'] = DISABLED
+            return
+        if not os.path.exists(self.app.settings.readerdir):
+            self._sync_button['state'] = DISABLED
+            return
+        current_state = self._sync_button['state']
+        desired_state = NORMAL if sensitive else DISABLED
+        if str(current_state) != str(desired_state):
+            self._sync_button['state'] = desired_state
+
     def sensitiveToolbar(self, sensitive):
         self._toolbarButtons[0]['state'] = DISABLED if sensitive else NORMAL
         for i in range(1, len(self._toolbarButtons)):
             self._toolbarButtons[i]['state'] = NORMAL if sensitive else DISABLED
+        self.sensitiveSyncButton(sensitive)
 
     def updateBookList(self):
         for i in self._tree.get_children():
@@ -213,64 +228,75 @@ class Neknihy():
     def refreshBooks(self):
         try:
             self.app.refreshRents()
-            self.error = None
+            self._error = None
         except Exception as e:
-            self.error = str(e)
+            self._error = str(e)
+
+    def syncButtonMonitor(self):
+        self.sensitiveSyncButton(True)
+        self._window.after(1000, self.syncButtonMonitor)
 
     def backgroundTaskMonitor(self):
-        if self.background_task is None:
+        if self._background_task is None:
             self.sensitiveToolbar(True)
             return
-        if self.background_task.is_alive():
+        if self._background_task.is_alive():
             self._window.after(100, self.backgroundTaskMonitor)
         else:
+            self._background_task = None
             self.sensitiveToolbar(True)
             self.updateBookList()
-            self.background_task = None
-            if self.error:
+            if self._error:
                 showinfo(
                     title='Chyba',
                     icon=WARNING,
-                    message=self.error)
-
-            self.error = None
+                    message=self._error)
+            self._error = None
+            if self._message:
+                showinfo(
+                    title='Info',
+                    icon=INFO,
+                    message=self._message)
+            self._message = None
 
     def onRefreshBooks(self):
         self.sensitiveToolbar(False)
-        self.background_task = threading.Thread(target=self.refreshBooks)
-        self.background_task.start()
+        self._background_task = threading.Thread(target=self.refreshBooks)
+        self._background_task.start()
         self.backgroundTaskMonitor()
 
     def downloadBooks(self):
         try:
             self.app.downloadBooks()
-            self.error = None
+            self._error = None
         except Exception as e:
-            self.error = str(e)
+            self._error = str(e)
 
     def onDownloadBooks(self):
         self.sensitiveToolbar(False)
-        self.background_task = threading.Thread(target=self.downloadBooks)
-        self.background_task.start()
+        self._background_task = threading.Thread(target=self.downloadBooks)
+        self._background_task.start()
         self.backgroundTaskMonitor()
 
     def onReturnBooks(self):
         self.app.returnBooks()
         self.updateBookList()
 
-    def onSyncReader(self):
+    def syncReader(self):
         result = self.app.syncReader()
         if result is not None:
-            showinfo(
-                title='Nahráno',
-                icon=INFO,
-                message=(
-                    "Přidáno/odstraněno/zůstává ve čtečce: %i/%i/%i" % (
-                        len(result["added"]),
-                        len(result["removed"]),
-                        result["total"])
-                )
+            self._message = (
+                "Přidáno/odstraněno/zůstává ve čtečce: %i/%i/%i" % (
+                    len(result["added"]),
+                    len(result["removed"]),
+                    result["total"])
             )
+
+    def onSyncReader(self):
+        self.sensitiveToolbar(False)
+        self._background_task = threading.Thread(target=self.syncReader)
+        self._background_task.start()
+        self.backgroundTaskMonitor()
 
     def onShowBooks(self):
         wd = self._workdir.get()

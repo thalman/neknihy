@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Exec=@LIBEXECDIR@/neknihy/neknihy.py
+Icon=@LIBEXECDIR@/neknihy/resources/neknihy.png
+Name=Neknihy
+Comment=Neknihy
