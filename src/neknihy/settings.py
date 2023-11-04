@@ -11,6 +11,9 @@ except ModuleNotFoundError:
 
 
 class Settings():
+    def __init__(self, config=None):
+        self._config_file = config if config else self._file_name()
+
     def _file_name(self):
         try:
             return os.path.join(GLib.get_user_config_dir(), "neknihy.conf")
@@ -23,7 +26,7 @@ class Settings():
 
     def load(self):
         config = configparser.ConfigParser()
-        config.read(self._file_name())
+        config.read(self._config_file)
         self.email = config.get("settings", "email", fallback="")
         self.password = config.get("settings", "password", fallback="")
         self.workdir = config.get("settings", "workdir", fallback="")
@@ -37,7 +40,7 @@ class Settings():
             "workdir": self.workdir if type(self.workdir) is str else "",
             "readerdir": self.readerdir if type(self.readerdir) is str else "",
         }
-        with open(self._file_name(), "w") as cf:
+        with open(self._config_file, "w") as cf:
             config.write(cf)
 
     def update(self, email, password, workdir, readerdir):

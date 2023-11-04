@@ -8,9 +8,9 @@ from shutil import copy
 
 
 class App():
-    def __init__(self):
+    def __init__(self, config=None):
         self.api = API()
-        self.settings = Settings()
+        self.settings = Settings(config)
         self.settings.load()
         self.books = []
         self.loadBooks()

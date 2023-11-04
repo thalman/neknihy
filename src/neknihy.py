@@ -11,15 +11,16 @@ import threading
 import subprocess
 import sys
 import os
+import argparse
 
 from neknihy.app import App
 
 
 class Neknihy():
-    def __init__(self):
+    def __init__(self, configfile):
         self.createGUI()
 
-        self.app = App()
+        self.app = App(configfile)
         self.app.updateStatus()
         self._background_task = None
         self._error = None
@@ -319,4 +320,9 @@ class Neknihy():
 
 
 if __name__ == '__main__':
-    Neknihy().run()
+    parser = argparse.ArgumentParser(description='Aplikace neknihy spravuje výpůjčku z knihovny.')
+    parser.add_argument('configfile',
+                        nargs='?',
+                        help='Konfigurační soubor')
+    args = parser.parse_args()
+    Neknihy(args.configfile).run()
