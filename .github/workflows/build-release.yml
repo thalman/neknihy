@@ -2,7 +2,7 @@ name: Build release artefacts
 run-name: Build release artefacts
 on:
   release:
-    type: [published]
+    types: [published]
 
 jobs:
   create-archive:
@@ -56,17 +56,10 @@ jobs:
           retention-days: 5
   
   release-articacts:
+    permissions: write-all
     runs-on: ubuntu-latest
     needs: [create-archive, build-rpm]
     steps:
-      - name: Detect release number
-        run: |
-          set -x
-          APP_VERSION=$GITHUB_SHA
-          if [ "$GITHUB_REF_TYPE" = "tag" ] ; then
-              APP_VERSION=`echo $GITHUB_REF_NAME | cut -dv -f2-`
-          fi
-          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
       - name: Download tar
         uses: actions/download-artifact@v3
         with:
@@ -75,15 +68,21 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: rpm
-      - name: Upload tar to release
-        uses: JasonEtco/upload-to-release@master
-        with:
-          args: neknihy-${{ env.APP_VERSION }}.tar.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Detect exact file names
+        run: |
+          APP_TAR=`ls neknihy*.tar.gz`
+          APP_RPM=`ls neknihy*.rpm`
+          echo "APP_TAR=$APP_TAR" >> "$GITHUB_ENV"
+          echo "APP_RPM=$APP_RPM" >> "$GITHUB_ENV"
       - name: Upload rpm to release
         uses: JasonEtco/upload-to-release@master
         with:
-          args: neknihy-${{ env.APP_VERSION }}.rpm
+          args: ${{ env.APP_RPM }} application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload tar to release
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: ${{ env.APP_TAR }} application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
