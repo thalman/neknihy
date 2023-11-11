@@ -26,11 +26,10 @@ nejspíš i na Macu.
 
 ### Linux
 
-Stáhnete si aplikaci na disk a spusťte ji
+Ze sekce ["Releases"](https://github.com/thalman/neknihy/releases)
+si stáhnete balíček s aplikací na disk a nainstalujte ho
 
-    git clone git@github.com:thalman/neknihy.git
-    cd neknihy/src
-    ./neknihy.py
+	sudo dnf install ./neknihy*.rpm
 
 ### Windows
 
@@ -54,6 +53,12 @@ Volitelně můžete změnit příponu souboru z .py na .pyw:
 
 Aplikace připravena k použití, spustíte ji poklikáním na soubor neknihy.py nebo
 neknihy.pyw
+
+### Ze zdrojového kódu
+
+    git clone git@github.com:thalman/neknihy.git
+    cd neknihy/src
+    ./neknihy.py
 
 ## Podpora mobi a kindle
 
