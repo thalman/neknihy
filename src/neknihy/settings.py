@@ -1,5 +1,6 @@
 import os.path
 import configparser
+import sys
 
 try:
     import platformdirs
@@ -96,7 +97,10 @@ class Settings():
         self.convert = config.get("settings", "convert", fallback="0")
         self.convertor = config.get("settings", "convertor", fallback="ebook-convert")
         if self.convertor == "":
-            self.convertor = "ebook-convert"
+            if sys.platform.startswith("win"):
+                self.convertor = "ebook-convert.exe"
+            else:
+                self.convertor = "ebook-convert"
         self._changed = False
 
     def save(self):

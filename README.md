@@ -55,6 +55,13 @@ Volitelně můžete změnit příponu souboru z .py na .pyw:
 Aplikace připravena k použití, spustíte ji poklikáním na soubor neknihy.py nebo
 neknihy.pyw
 
+## Podpora mobi a kindle
+
+Pokud máte nainstalovanou aplikaci [Calibre](https://calibre-ebook.com/),
+mohou Neknihy převést vypůjčenou publikaci do formátu `mobi` automaticky.
+V záložce `Nastavení` zatrhněte volbu `Převádět na .mobi` a vyplňte cestu
+k programu `ebook-convert` (součást Calibre).
+
 ## Screenshot
 
 ![mainwindow](contrib/screenshot.png "Screenshot")

@@ -178,14 +178,16 @@ class Neknihy():
         # mobi convertor
         self._convert = tk.StringVar()
         checkbox = ttk.Checkbutton(p2,
-                                   text='Převést na .mobi (pro Kindle)',
+                                   text='Převádět na .mobi (pro Kindle)',
                                    variable=self._convert)
         checkbox.grid(column=1, row=4, columnspan=2, sticky=tk.EW, padx=5, pady=0)
-        label = ttk.Label(p2, text="Konverzní příkaz")
+        label = ttk.Label(p2, text="Cesta k ebook-convert")
         label.grid(column=0, row=5, sticky=tk.EW, padx=5, pady=5)
         self._convertor = tk.StringVar()
         entry = ttk.Entry(p2, textvariable=self._convertor)
-        entry.grid(column=1, row=5, columnspan=2, sticky=tk.EW, padx=5, pady=10)
+        entry.grid(column=1, row=5, sticky=tk.EW, padx=5, pady=10)
+        button = ttk.Button(p2, image=self._img_open_small, command=self.onSelectConvertor)
+        button.grid(column=2, row=5, padx=5, pady=0)
 
     def onSelectFolder(self):
         dir = self._workdir.get()
@@ -204,6 +206,14 @@ class Neknihy():
             mustexist=False)
         if name != "":
             self._readerdir.set(name)
+
+    def onSelectConvertor(self):
+        dir = self._convertor.get()
+        file = tk.filedialog.askopenfile(
+            title="Aplikace pro konverzi knih",
+            initialfile=dir)
+        if file:
+            self._convertor.set(file.name)
 
     def sensitiveSyncButton(self, sensitive):
         if self._background_task is not None:
@@ -298,14 +308,19 @@ class Neknihy():
         self.updateBookList()
 
     def syncReader(self):
-        result = self.app.syncReader()
-        if result is not None:
-            self._message = (
-                "Přidáno/odstraněno/zůstává ve čtečce: %i/%i/%i" % (
-                    len(result["added"]),
-                    len(result["removed"]),
-                    result["total"])
-            )
+        try:
+            self._message = None
+            self._error = None
+            result = self.app.syncReader()
+            if result is not None:
+                self._message = (
+                    "Přidáno/odstraněno/zůstává ve čtečce: %i/%i/%i" % (
+                        len(result["added"]),
+                        len(result["removed"]),
+                        result["total"])
+                )
+        except Exception as e:
+            self._error = str(e)
 
     def onSyncReader(self):
         self.sensitiveToolbar(False)
@@ -315,7 +330,7 @@ class Neknihy():
 
     def onShowBooks(self):
         wd = self._workdir.get()
-        if sys.platform == "win32":
+        if sys.platform.startswith("win"):
             os.startfile(wd)
         else:
             opener = "open" if sys.platform == "darwin" else "xdg-open"

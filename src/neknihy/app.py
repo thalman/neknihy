@@ -3,6 +3,8 @@ from neknihy.settings import Settings
 
 import os.path
 import json
+import re
+import subprocess
 from datetime import datetime, timezone
 from shutil import copy
 
@@ -125,6 +127,7 @@ class App():
         self.saveBooks()
 
     def bookByFilename(self, filename):
+        filename = re.sub(".mobi$", ".epub", filename)
         for i in range(len(self.books)):
             if filename == self.books[i]["neknihy"]["filename"]:
                 return i
@@ -139,16 +142,22 @@ class App():
         for i in range(len(self.books)):
             if self.books[i]["neknihy"]["status"] == "ok":
                 src = self.bookFile(i)
+                filename = self.books[i]["neknihy"]["filename"]
+                if self.settings.convert == "1":
+                    filename = re.sub(".epub$", ".mobi", filename)
                 dst = os.path.join(
                     self.settings.readerdir,
-                    self.books[i]["neknihy"]["filename"]
+                    filename
                 )
                 if os.path.exists(src) and not os.path.exists(dst):
-                    copy(src, dst)
+                    if self.settings.convert == "1":
+                        subprocess.run([self.settings.convertor, src, dst])
+                    else:
+                        copy(src, dst)
                     result["added"].append(self.books[i]["neknihy"]["filename"])
                 result["total"] += 1
         for fn in os.listdir(self.settings.readerdir):
-            if fn.lower().endswith("-palmknihy.epub"):
+            if fn.lower().endswith("-palmknihy.epub") or fn.lower().endswith("-palmknihy.mobi"):
                 if self.bookByFilename(fn) is None:
                     os.remove(os.path.join(self.settings.readerdir, fn))
                     result["removed"].append(fn)
