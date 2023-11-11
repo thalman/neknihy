@@ -1,0 +1,16 @@
+name: check-pr-actions
+run-name: Checking PR
+on: [pull_request]
+jobs:
+  check-formating:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python environment
+        uses: actions/setup-python@v4
+      - name: Run flake8
+        uses: py-actions/flake8@v2
+        with:
+          max-line-length: "100"
+          path: "src"
