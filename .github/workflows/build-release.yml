@@ -1,0 +1,89 @@
+name: Build release artefacts
+run-name: Build release artefacts
+on:
+  release:
+    type: [published]
+
+jobs:
+  create-archive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4        
+      - name: Create archive
+        run: |
+          set -x
+          APP_VERSION=$GITHUB_SHA
+          if [ "$GITHUB_REF_TYPE" = "tag" ] ; then
+              APP_VERSION=`echo $GITHUB_REF_NAME | cut -dv -f2-`
+          fi
+          git archive --format=tar.gz --prefix=neknihy-$APP_VERSION/ HEAD >neknihy-$APP_VERSION.tar.gz
+          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
+      - name: Upload tar archive
+        uses: actions/upload-artifact@v3
+        with:
+          name: tar
+          path: neknihy-*.tar.gz
+          retention-days: 5
+
+  build-rpm:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    needs: create-archive
+    steps:
+      - name: Download tar
+        uses: actions/download-artifact@v3
+        with:
+          name: tar
+      - name: Install dependencies
+        run: |
+          dnf -y install rpm-build python3-devel git
+      - name: Build rpm
+        run: |
+          set -x
+          APP_VERSION=$GITHUB_SHA
+          if [ "$GITHUB_REF_TYPE" = "tag" ] ; then
+              APP_VERSION=`echo $GITHUB_REF_NAME | cut -dv -f2-`
+          fi
+          echo $APP_VERSION
+          rpmbuild -D "SRCVERSION $APP_VERSION" -D "_rpmdir $(pwd)/rpm" -ta neknihy-*.tar.gz
+          mv rpm/noarch/*.rpm ./
+      - name: Upload rpm
+        uses: actions/upload-artifact@v3
+        with:
+          name: rpm
+          path: neknihy-*.rpm
+          retention-days: 5
+  
+  release-articacts:
+    runs-on: ubuntu-latest
+    needs: [create-archive, build-rpm]
+    steps:
+      - name: Detect release number
+        run: |
+          set -x
+          APP_VERSION=$GITHUB_SHA
+          if [ "$GITHUB_REF_TYPE" = "tag" ] ; then
+              APP_VERSION=`echo $GITHUB_REF_NAME | cut -dv -f2-`
+          fi
+          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
+      - name: Download tar
+        uses: actions/download-artifact@v3
+        with:
+          name: tar
+      - name: Download rpm
+        uses: actions/download-artifact@v3
+        with:
+          name: rpm
+      - name: Upload tar to release
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: neknihy-${{ env.APP_VERSION }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload rpm to release
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: neknihy-${{ env.APP_VERSION }}.rpm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
