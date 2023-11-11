@@ -31,6 +31,8 @@ class Neknihy():
         self._password.set(self.app.settings.password)
         self._workdir.set(self.app.settings.workdir)
         self._readerdir.set(self.app.settings.readerdir)
+        self._convert.set(self.app.settings.convert)
+        self._convertor.set(self.app.settings.convertor)
         self.updateBookList()
         self.syncButtonMonitor()
 
@@ -173,6 +175,18 @@ class Neknihy():
         button = ttk.Button(p2, image=self._img_open_small, command=self.onSelectReaderFolder)
         button.grid(column=2, row=3, padx=5, pady=0)
 
+        # mobi convertor
+        self._convert = tk.StringVar()
+        checkbox = ttk.Checkbutton(p2,
+                                   text='Převést na .mobi (pro Kindle)',
+                                   variable=self._convert)
+        checkbox.grid(column=1, row=4, columnspan=2, sticky=tk.EW, padx=5, pady=0)
+        label = ttk.Label(p2, text="Konverzní příkaz")
+        label.grid(column=0, row=5, sticky=tk.EW, padx=5, pady=5)
+        self._convertor = tk.StringVar()
+        entry = ttk.Entry(p2, textvariable=self._convertor)
+        entry.grid(column=1, row=5, columnspan=2, sticky=tk.EW, padx=5, pady=10)
+
     def onSelectFolder(self):
         dir = self._workdir.get()
         name = tk.filedialog.askdirectory(
@@ -312,7 +326,9 @@ class Neknihy():
             self._email.get(),
             self._password.get(),
             self._workdir.get(),
-            self._readerdir.get()
+            self._readerdir.get(),
+            self._convert.get(),
+            self._convertor.get()
         )
 
     def onCancelJob(self, button):
@@ -320,7 +336,7 @@ class Neknihy():
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Aplikace neknihy spravuje výpůjčku z knihovny.')
+    parser = argparse.ArgumentParser(description='Aplikace neknihy spravuje výpůjčky z knihovny.')
     parser.add_argument('configfile',
                         nargs='?',
                         help='Konfigurační soubor')

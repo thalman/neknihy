@@ -15,9 +15,10 @@ class App():
         self.books = []
         self.loadBooks()
 
-    def updateSettings(self, email, password, workdir, readerdir):
-        self.settings.update(email, password, workdir, readerdir)
+    def updateSettings(self, email, password, workdir, readerdir, convert, convertor):
+        self.settings.update(email, password, workdir, readerdir, convert, convertor)
         self.api.logout()
+        self.loadBooks()
 
     def saveBooks(self):
         if not self.settings.configured():
