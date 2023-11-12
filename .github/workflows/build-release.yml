@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4        
+        uses: actions/checkout@v4
       - name: Create archive
         run: |
           set -x
@@ -54,11 +54,52 @@ jobs:
           name: rpm
           path: neknihy-*.rpm
           retention-days: 5
-  
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Create Executable
+        uses: sayyid5416/pyinstaller@v1.3.0
+        with:
+          spec: 'src/neknihy.py'
+          requirements: 'src/REQUIREMENTS.txt'
+          options:  --add-data src/resources:resources --icon src/resources/neknihy.ico -w
+          upload_exe_with_name: 'exe'
+
+  repack-windows-zip:
+    runs-on: ubuntu-latest
+    needs: build-windows
+    steps:
+      - name: Install packages
+        run: |
+          sudo apt-get install --yes zip
+      - name: Download exe
+        uses: actions/download-artifact@v3
+        with:
+          name: exe
+      - name: Make zip
+        run: |
+          set -x
+          APP_VERSION=$GITHUB_SHA
+          if [ "$GITHUB_REF_TYPE" = "tag" ] ; then
+              APP_VERSION=`echo $GITHUB_REF_NAME | cut -dv -f2-`
+          fi
+          echo $APP_VERSION
+          cd neknihy
+          zip -r ../neknihy-win-$APP_VERSION.zip *
+      - name: Upload tar archive
+        uses: actions/upload-artifact@v3
+        with:
+          name: zip
+          path: neknihy-win-*.zip
+          retention-days: 5
+
   release-articacts:
     permissions: write-all
     runs-on: ubuntu-latest
-    needs: [create-archive, build-rpm]
+    needs: [create-archive, build-rpm, repack-windows-zip]
     steps:
       - name: Download tar
         uses: actions/download-artifact@v3
@@ -68,12 +109,15 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: rpm
+      - name: Download zip
+        uses: actions/download-artifact@v3
+        with:
+          name: zip
       - name: Detect exact file names
         run: |
-          APP_TAR=`ls neknihy*.tar.gz`
-          APP_RPM=`ls neknihy*.rpm`
-          echo "APP_TAR=$APP_TAR" >> "$GITHUB_ENV"
-          echo "APP_RPM=$APP_RPM" >> "$GITHUB_ENV"
+          echo "APP_TAR=`ls neknihy*.tar.gz`" >> "$GITHUB_ENV"
+          echo "APP_RPM=`ls neknihy*.rpm`" >> "$GITHUB_ENV"
+          echo "APP_ZIP=`ls neknihy*.zip`" >> "$GITHUB_ENV"
       - name: Upload rpm to release
         uses: JasonEtco/upload-to-release@master
         with:
@@ -84,5 +128,11 @@ jobs:
         uses: JasonEtco/upload-to-release@master
         with:
           args: ${{ env.APP_TAR }} application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload zip to release
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: ${{ env.APP_ZIP }} application/octet-stream
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
