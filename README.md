@@ -65,12 +65,6 @@ souboru z .py na .pyw:
 Aplikace připravena k použití, spustíte ji poklikáním na soubor neknihy.py nebo
 neknihy.pyw
 
-### Ze zdrojového kódu
-
-    git clone git@github.com:thalman/neknihy.git
-    cd neknihy/src
-    ./neknihy.py
-
 ## Podpora mobi a kindle
 
 Pokud máte nainstalovanou aplikaci [Calibre](https://calibre-ebook.com/),
