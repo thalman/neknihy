@@ -31,7 +31,17 @@ si stáhnete balíček s aplikací na disk a nainstalujte ho
 
 	sudo dnf install ./neknihy*.rpm
 
-### Windows
+### Windows binární soubory
+
+Ze sekce ["Releases"](https://github.com/thalman/neknihy/releases)
+si stáhnete balíček (zip) pro windows na disk. Rozbalte ho a spusťte
+aplikaci neknihy.exe
+
+Některé antiviry mohou považovat stažené soubory za podezřelé.
+V takovém případě buď nastavte vyjímku v antivirovém programu a nebo
+nainstalujte aplikaci ze zdrojových kódů.
+
+### Windows ze zdrojových kódů
 
 Aplikace pro svůj běh potřebuje Python, stáhněte si a nainstaluje
 [Python z oficiálního zdroje](https://www.python.org/downloads/windows/).
@@ -43,9 +53,10 @@ nainstalován a je možné ho spustit
     c:\...> python --version
     Python 3.11.6
 
-Stáhněte si [aplikaci neknihy](https://github.com/thalman/neknihy/releases) a
-rozbalte ji na disk. V příkazovém řádku doinstalujte potřebné závislosti.
-Volitelně můžete změnit příponu souboru z .py na .pyw:
+Stáhněte si [zdrojové kódy](https://github.com/thalman/neknihy/releases)
+aplikace neknihy (Source code) a rozbalte je na disk. V příkazovém
+řádku doinstalujte potřebné závislosti. Volitelně můžete změnit příponu
+souboru z .py na .pyw:
 
     c:\...> cd .....\neknihy\src
     c:\...> python -m pip install -r REQUIREMENTS.txt
