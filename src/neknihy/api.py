@@ -10,7 +10,6 @@ class API():
         self._url = "https://prodapp.palmknihy.cz"
         self._login = None
         self._rents = None
-        print(debug)
         if debug:
             HTTPConnection.debuglevel = 1
 
@@ -23,7 +22,8 @@ class API():
                                  data=json.dumps(data),
                                  headers=headers)
         if response.status_code >= 300:
-            raise RuntimeError("Nepodařilo se přihlásit, zkontrolujte jméno a heslo\n(%s)" % response.text)
+            raise RuntimeError("Nepodařilo se přihlásit, zkontrolujte jméno a heslo\n(%s)" %
+                               response.text)
         self._login = json.loads(response.text)
 
     def logout(self):
@@ -37,7 +37,8 @@ class API():
         }
         response = requests.get(self._url + "/rents/?refresh", headers=headers)
         if response.status_code >= 300:
-            raise RuntimeError("Nepodařilo se načíst seznam zapůjčených knih\n(%s)" % response.text)
+            raise RuntimeError("Nepodařilo se načíst seznam zapůjčených knih\n(%s)" %
+                               response.text)
         self._rents = json.loads(response.text)
         return self._rents["results"]
 
@@ -56,7 +57,8 @@ class API():
                str(book["variant_palm_id"]) + "/")
         response = requests.get(url, headers=headers)
         if response.status_code >= 300:
-            raise RuntimeError("Nepodařilo se získat odkaz ke stažení výpujčky\n(%s)" % response.text)
+            raise RuntimeError("Nepodařilo se získat odkaz ke stažení výpujčky\n(%s)" %
+                               response.text)
         return json.loads(response.text)
 
     def downloadBook(self, workdir, book):
@@ -80,5 +82,6 @@ class API():
                 if chunk:
                     f.write(chunk)
         if response.status_code >= 300:
-            raise RuntimeError("Nepodařilo se stáhnout knihu %s\n(%s)" % (filename, response.text))
+            raise RuntimeError("Nepodařilo se stáhnout knihu %s\n(%s)" %
+                               (filename, response.text))
         book["neknihy"] = {"status": "ok", "filename": filename}
