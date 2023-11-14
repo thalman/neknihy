@@ -10,8 +10,8 @@ from shutil import copy
 
 
 class App():
-    def __init__(self, config=None):
-        self.api = API()
+    def __init__(self, config=None, debug=False):
+        self.api = API(debug)
         self.settings = Settings(config)
         self.settings.load()
         self.books = []

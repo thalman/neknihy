@@ -17,10 +17,10 @@ from neknihy.app import App
 
 
 class Neknihy():
-    def __init__(self, configfile):
+    def __init__(self, configfile, debug=False):
         self.createGUI()
 
-        self.app = App(configfile)
+        self.app = App(configfile, debug)
         self.app.updateStatus()
         self._background_task = None
         self._error = None
@@ -367,5 +367,8 @@ if __name__ == '__main__':
     parser.add_argument('configfile',
                         nargs='?',
                         help='Konfigurační soubor')
+    parser.add_argument('-d', '--debug',
+                        action='store_true',
+                        help='Tisknout ladicí informace')
     args = parser.parse_args()
-    Neknihy(args.configfile).run()
+    Neknihy(args.configfile, args.debug).run()
