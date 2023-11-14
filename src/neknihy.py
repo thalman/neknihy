@@ -133,13 +133,15 @@ class Neknihy():
         button.pack(side="left", padx=5, pady=5)
         self.addTooltip(button, "Otevřít složku s knihami")
 
-        columns = ("author", "book", "rent", "status")
+        columns = ("book", "rent", "status")
         tree = ttk.Treeview(p1, columns=columns, show='headings')
         tree.pack(fill=tk.BOTH, expand=True)
-        tree.heading("author", text='Autor')
         tree.heading("book", text='Kniha')
+        tree.column("book", minwidth=0, width=200)
         tree.heading("rent", text='Výpůjčka do')
+        tree.column("rent", minwidth=0, width=100)
         tree.heading("status", text='Stav')
+        tree.column("status", minwidth=0, width=400)
         self._tree = tree
 
         # settings page
@@ -233,6 +235,17 @@ class Neknihy():
             self._toolbarButtons[i]['state'] = NORMAL if sensitive else DISABLED
         self.sensitiveSyncButton(sensitive)
 
+    def statusToText(self, status):
+        if status == "new":
+            return "Nová výpůjčka"
+        if status == "pending":
+            return "Připravuje se ke stažení"
+        if status == "ok":
+            return "Výpůjčka je připravená a stažená"
+        if status == "expired":
+            return "K vrácení"
+        return "??"
+
     def updateBookList(self):
         for i in self._tree.get_children():
             self._tree.delete(i)
@@ -241,10 +254,9 @@ class Neknihy():
                 "",
                 tk.END,
                 values=(
-                    book["author_full_name"] if book["author_full_name"] else "??",
                     book["title"],
                     book["end_time"].split("T")[0] if "end_time" in book else "",
-                    book["neknihy"]["status"] if "neknihy" in book else ""
+                    self.statusToText(book["neknihy"]["status"] if "neknihy" in book else "")
                 ))
 
     def run(self):
