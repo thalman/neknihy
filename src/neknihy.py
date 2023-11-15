@@ -133,6 +133,9 @@ class Neknihy():
         button.pack(side="left", padx=5, pady=5)
         self.addTooltip(button, "Otevřít složku s knihami")
 
+        style = ttk.Style()
+        style.configure('Treeview', font=(None, 10),
+                        rowheight=int(10*2.5))
         columns = ("book", "rent", "status")
         tree = ttk.Treeview(p1, columns=columns, show='headings')
         tree.pack(fill=tk.BOTH, expand=True)
