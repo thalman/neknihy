@@ -94,7 +94,6 @@ class Neknihy():
         toolbar = ttk.Frame(p1)
         toolbar.pack(fill=tk.X)
 
-        self._img_cancel = tk.PhotoImage(file=os.path.join(resources, "cancel.png"))
         self._img_refresh = tk.PhotoImage(file=os.path.join(resources, "refresh.png"))
         self._img_download = tk.PhotoImage(file=os.path.join(resources, "download.png"))
         self._img_return = tk.PhotoImage(file=os.path.join(resources, "return.png"))
@@ -102,12 +101,13 @@ class Neknihy():
         self._img_to_reader = tk.PhotoImage(file=os.path.join(resources, "toreader.png"))
         self._img_open_small = self._img_open.subsample(2, 2)
 
-        self._toolbarButtons = []
-        button = ttk.Button(toolbar, image=self._img_cancel)
-        button.pack(side="right", padx=5, pady=5)
-        button['state'] = DISABLED
-        self._toolbarButtons.append(button)
+        self._progressBar = button = ttk.Progressbar(toolbar,
+                                                     orient='horizontal',
+                                                     mode='indeterminate',
+                                                     maximum=20,
+                                                     length=70)
 
+        self._toolbarButtons = []
         button = ttk.Button(toolbar, image=self._img_refresh, command=self.onRefreshBooks)
         button.pack(side="left", padx=5, pady=5)
         self.addTooltip(button, "Načíst nové výpůjčky")
@@ -217,6 +217,14 @@ class Neknihy():
         if file:
             self._convertor.set(file.name)
 
+    def visibleProgressbar(self, visible):
+        if visible:
+            self._progressBar.pack(side="right", padx=5, pady=5)
+            self._progressBar.start(20)
+        else:
+            self._progressBar.stop()
+            self._progressBar.pack_forget()
+
     def sensitiveSyncButton(self, sensitive):
         if self._background_task is not None:
             self._sync_button['state'] = DISABLED
@@ -230,8 +238,7 @@ class Neknihy():
             self._sync_button['state'] = desired_state
 
     def sensitiveToolbar(self, sensitive):
-        self._toolbarButtons[0]['state'] = DISABLED if sensitive else NORMAL
-        for i in range(1, len(self._toolbarButtons)):
+        for i in range(0, len(self._toolbarButtons)):
             self._toolbarButtons[i]['state'] = NORMAL if sensitive else DISABLED
         self.sensitiveSyncButton(sensitive)
 
@@ -276,12 +283,14 @@ class Neknihy():
     def backgroundTaskMonitor(self):
         if self._background_task is None:
             self.sensitiveToolbar(True)
+            self.visibleProgressbar(False)
             return
         if self._background_task.is_alive():
             self._window.after(100, self.backgroundTaskMonitor)
         else:
             self._background_task = None
             self.sensitiveToolbar(True)
+            self.visibleProgressbar(False)
             self.updateBookList()
             if self._error:
                 showinfo(
@@ -298,6 +307,7 @@ class Neknihy():
 
     def onRefreshBooks(self):
         self.sensitiveToolbar(False)
+        self.visibleProgressbar(True)
         self._background_task = threading.Thread(target=self.refreshBooks)
         self._background_task.start()
         self.backgroundTaskMonitor()
@@ -311,6 +321,7 @@ class Neknihy():
 
     def onDownloadBooks(self):
         self.sensitiveToolbar(False)
+        self.visibleProgressbar(True)
         self._background_task = threading.Thread(target=self.downloadBooks)
         self._background_task.start()
         self.backgroundTaskMonitor()
@@ -336,6 +347,7 @@ class Neknihy():
 
     def onSyncReader(self):
         self.sensitiveToolbar(False)
+        self.visibleProgressbar(True)
         self._background_task = threading.Thread(target=self.syncReader)
         self._background_task.start()
         self.backgroundTaskMonitor()
@@ -357,9 +369,6 @@ class Neknihy():
             self._convert.get(),
             self._convertor.get()
         )
-
-    def onCancelJob(self, button):
-        pass
 
 
 if __name__ == '__main__':
