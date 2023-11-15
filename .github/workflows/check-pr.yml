@@ -1,4 +1,4 @@
-name: check-pr-actions
+name: Check PR
 run-name: Checking PR
 on: [pull_request]
 jobs:
