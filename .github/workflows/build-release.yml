@@ -110,13 +110,13 @@ jobs:
           pushd macos
           zip -r ../neknihy-macos-$APP_VERSION.zip *
           popd
-      - name: Upload tar archive
+      - name: Upload win-zip archive
         uses: actions/upload-artifact@v3
         with:
           name: win-zip
           path: neknihy-win-*.zip
           retention-days: 5
-      - name: Upload tar archive
+      - name: Upload macos-zip archive
         uses: actions/upload-artifact@v3
         with:
           name: macos-zip
