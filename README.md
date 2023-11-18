@@ -11,18 +11,19 @@ množství čteček nefunguje dobře nebo vůbec.
 
 Proto jsem vytvořil tuto aplikaci, která umožňuje pracovat
 s výpujčkami na desktopu. Knihy je možné stáhnout do vybrané
-složky odkud je snadno dostanete do čtečky tak, jak jste zvyklí.
+složky odkud se synchronizují s vybranou složkou ve čtečce.
 
-Knihy lze po uplynutí výpůjční doby snadno vrátit (smazat z počítače)
-přímo tlačítkem v aplikaci. Nezapomeňte knihu smazat také ze čtečky.
+Knihy lze po uplynutí výpůjční doby snadno vrátit přímo tlačítkem
+v aplikaci. Při další synchronizaci se čtečkou dojde i k smazání
+knih ve čtečce.
 
 Účelem aplikace není nekalé kopírování, ale umožnit
 lidem plnohodnotný čtenářský zážitek a komfort.
 
-## Instalace
+## Instalace z balíčků
 
-Aplikace nemá žádný instalační balíček. Funguje na Linuxu, Windows a
-nejspíš i na Macu.
+V sekci ["Releases"](https://github.com/thalman/neknihy/releases)
+najdete balíčky pro Fedora Linux, Window a MacOS.
 
 ### Linux
 
@@ -31,7 +32,7 @@ si stáhnete balíček s aplikací na disk a nainstalujte ho
 
 	sudo dnf install ./neknihy*.rpm
 
-### Windows binární soubory
+### Windows
 
 Ze sekce ["Releases"](https://github.com/thalman/neknihy/releases)
 si stáhnete balíček (zip) pro windows na disk. Rozbalte ho a spusťte
@@ -41,7 +42,49 @@ Některé antiviry mohou považovat stažené soubory za podezřelé.
 V takovém případě buď nastavte vyjímku v antivirovém programu a nebo
 nainstalujte aplikaci ze zdrojových kódů.
 
-### Windows ze zdrojových kódů
+### MacOS X
+
+Ze sekce ["Releases"](https://github.com/thalman/neknihy/releases)
+si stáhnete balíček (zip) pro MacOS na disk. Rozbalte ho a spusťte
+aplikaci neknihy.
+
+## Screenshot
+
+![mainwindow](contrib/screenshot.png "Screenshot")
+
+## Podpora mobi a kindle
+
+Pokud máte nainstalovanou aplikaci [Calibre](https://calibre-ebook.com/),
+mohou Neknihy převést vypůjčenou publikaci do formátu `mobi` automaticky.
+V záložce `Nastavení` zatrhněte volbu `Převádět na .mobi` a vyplňte cestu
+k programu `ebook-convert` (součást Calibre).
+
+## Instalace ze zdrojových kódů
+
+### Linux
+
+Ze sekce ["Releases"](https://github.com/thalman/neknihy/releases)
+si stáhněte archiv se zdrojovým kódem. Nainstalujte python3 z distribuce.
+Doinstalujte závislosti a spusťte aplikaci. Příklad pro Fedora Linux:
+
+    sudo dnf install python3 python3-requests python3-gobject
+    tar -xzf ./neknihy-${RELEASE}.tar.gz
+    ./neknihy-${RELEASE}/src/neknihy.py
+
+Příklad instalace s python virtual environment
+
+    sudo dnf install python3
+    tar -xzf ./neknihy-${RELEASE}.tar.gz
+    cd ./neknihy-${RELEASE}
+    python -m venv venv
+    source venv/bin/activate
+    pip install -r src/REQUIREMENTS.txt
+    ./src/neknihy.py
+
+Pokud máte potíže s instalací `PyGObject`, použijte místo něho
+`platformdirs` (`pip install platformdirs`)
+
+### Windows
 
 Aplikace pro svůj běh potřebuje Python, stáhněte si a nainstaluje
 [Python z oficiálního zdroje](https://www.python.org/downloads/windows/).
@@ -64,14 +107,3 @@ souboru z .py na .pyw:
 
 Aplikace připravena k použití, spustíte ji poklikáním na soubor neknihy.py nebo
 neknihy.pyw
-
-## Podpora mobi a kindle
-
-Pokud máte nainstalovanou aplikaci [Calibre](https://calibre-ebook.com/),
-mohou Neknihy převést vypůjčenou publikaci do formátu `mobi` automaticky.
-V záložce `Nastavení` zatrhněte volbu `Převádět na .mobi` a vyplňte cestu
-k programu `ebook-convert` (součást Calibre).
-
-## Screenshot
-
-![mainwindow](contrib/screenshot.png "Screenshot")
