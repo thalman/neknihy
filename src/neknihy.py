@@ -79,6 +79,9 @@ class Neknihy():
         self._window.minsize(600, 400)
         self._icon = tk.PhotoImage(file=os.path.join(resources, 'neknihy.png'))
         self._window.iconphoto(True, self._icon)
+        if sys.platform == "darwin":
+            style = ttk.Style(self._window)
+            style.theme_use('default')
         nb = ttk.Notebook(self._window)
 
         p1 = ttk.Frame(nb)
