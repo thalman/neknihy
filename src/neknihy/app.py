@@ -46,21 +46,27 @@ class App():
         self.api.login(self.settings.email, self.settings.password)
         rents = self.api.getListOfRentedBooks()
         for rent in rents:
-            if self.bookIndexByPalmId(rent["palm_id"]) is None:
-                rent["neknihy"] = {"status": "new", "filename": ""}
-                self.books.append(rent)
+            if not self.bookExpired(rent):
+                if self.bookIndexByPalmId(rent["palm_id"]) is None:
+                    rent["neknihy"] = {"status": "new", "filename": ""}
+                    self.books.append(rent)
         self.saveBooks()
         self.updateStatus()
+
+    def bookExpired(self, book):
+        if "end_time" in book:
+            time = datetime.fromisoformat(book["end_time"])
+            if time < datetime.now(timezone.utc):
+                return True
+        return False
 
     def updateStatus(self):
         changed = False
         for book in self.books:
             try:
-                if "end_time" in book:
-                    time = datetime.fromisoformat(book["end_time"])
-                    if time < datetime.now(timezone.utc) and book["neknihy"]["status"] != "expired":
-                        book["neknihy"]["status"] = "expired"
-                        changed = True
+                if self.bookExpired(book) and book["neknihy"]["status"] != "expired":
+                    book["neknihy"]["status"] = "expired"
+                    changed = True
             except Exception:
                 pass
         if changed:
