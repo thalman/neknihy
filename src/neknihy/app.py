@@ -116,11 +116,17 @@ class App():
         if not self.settings.configured():
             return
         self.api.login(self.settings.email, self.settings.password)
+        exc = None
         for i in range(len(self.books)):
-            if not self.bookDownloaded(i):
-                self.downloadBook(i)
+            try:
+                if not self.bookDownloaded(i):
+                    self.downloadBook(i)
+            except Exception as e:
+                exc = e
         self.saveBooks()
         self.updateStatus()
+        if exc is not None:
+            raise exc
 
     def returnBooks(self):
         books = []
