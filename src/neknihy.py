@@ -79,9 +79,10 @@ class Neknihy():
         self._window.minsize(600, 400)
         self._icon = tk.PhotoImage(file=os.path.join(resources, 'neknihy.png'))
         self._window.iconphoto(True, self._icon)
+        style = ttk.Style(self._window)
         if sys.platform == "darwin":
-            style = ttk.Style(self._window)
             style.theme_use('default')
+            style.map('TButton', background=[('disabled', '#BBBBBB')])
         nb = ttk.Notebook(self._window)
 
         p1 = ttk.Frame(nb)
@@ -111,28 +112,31 @@ class Neknihy():
                                                      length=70)
 
         self._toolbarButtons = []
-        button = ttk.Button(toolbar, image=self._img_refresh, command=self.onRefreshBooks)
+        button = ttk.Button(toolbar, image=self._img_refresh,
+                            command=self.onRefreshBooks, style="TButton")
         button.pack(side="left", padx=5, pady=5)
         self.addTooltip(button, "Načíst nové výpůjčky")
         self._toolbarButtons.append(button)
 
-        button = ttk.Button(toolbar, image=self._img_download, command=self.onDownloadBooks)
+        button = ttk.Button(toolbar, image=self._img_download,
+                            command=self.onDownloadBooks, style="TButton")
         button.pack(side="left", padx=5, pady=5)
         self.addTooltip(button, "Stáhnout nově zapůjčené knihy")
         self._toolbarButtons.append(button)
 
-        button = ttk.Button(toolbar, image=self._img_return, command=self.onReturnBooks)
+        button = ttk.Button(toolbar, image=self._img_return,
+                            command=self.onReturnBooks, style="TButton")
         button.pack(side="left", padx=5, pady=5)
         self.addTooltip(button, "Smazat knihy, u kterých\nvypršela výpůjční doba")
         self._toolbarButtons.append(button)
 
-        self._sync_button = ttk.Button(toolbar,
-                                       image=self._img_to_reader,
-                                       command=self.onSyncReader)
+        self._sync_button = ttk.Button(toolbar, image=self._img_to_reader,
+                                       command=self.onSyncReader, style="TButton")
         self._sync_button.pack(side="left", padx=5, pady=5)
         self.addTooltip(self._sync_button, "Synchronizovat výpůjčky s čtečkou")
 
-        button = ttk.Button(toolbar, image=self._img_open, command=self.onShowBooks)
+        button = ttk.Button(toolbar, image=self._img_open,
+                            command=self.onShowBooks, style="TButton")
         button.pack(side="left", padx=5, pady=5)
         self.addTooltip(button, "Otevřít složku s knihami")
 
