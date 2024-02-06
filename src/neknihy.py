@@ -36,6 +36,24 @@ class Neknihy():
         self.updateBookList()
         self.syncButtonMonitor()
 
+        self.gettext_map = {
+            "pridano": [
+                "Do čtečky byla přidána %i kniha, ",
+                "Do čtečky byly přidány %i knihy, ",
+                "Do čtečky bylo přidáno %i knih, "
+            ],
+            "odstraneno": [
+                "odstraněna byla %i kniha, ",
+                "odstraněny byly %i knihy, ",
+                "odstraněno bylo %i knih, "
+            ],
+            "celkem": [
+                "ve čtečce je %i vypůjčená kniha.",
+                "ve čtečce jsou %i vypůjčené knihy.",
+                "ve čtečce je %i vypůjčených knih."
+            ]
+        }
+
     def _resourcesFolder(self):
         for resources in [
                 os.path.join(os.path.abspath(os.path.dirname(__file__)), 'resources'),
@@ -74,6 +92,7 @@ class Neknihy():
     def createGUI(self):
         resources = self._resourcesFolder()
         self._window = tk.Tk()
+        self._window.option_add('*Dialog.msg.font', 'Helvetica 12')
         self._window.title("Neknihy")
         self._window.geometry("800x600")
         self._window.minsize(600, 400)
@@ -343,6 +362,14 @@ class Neknihy():
         self.app.returnBooks()
         self.updateBookList()
 
+    def gettext(self, sentence, amount):
+        idx = 0
+        if amount > 1:
+            idx = 1
+        if amount >= 5 or amount == 0:
+            idx = 2
+        return self.gettext_map[sentence][idx] % (amount)
+
     def syncReader(self):
         try:
             self._message = None
@@ -350,10 +377,9 @@ class Neknihy():
             result = self.app.syncReader()
             if result is not None:
                 self._message = (
-                    "Přidáno/odstraněno/zůstává ve čtečce: %i/%i/%i" % (
-                        len(result["added"]),
-                        len(result["removed"]),
-                        result["total"])
+                    self.gettext("pridano", len(result["added"])) +
+                    self.gettext("odstraneno", len(result["removed"])) +
+                    self.gettext("celkem", result["total"])
                 )
         except Exception as e:
             self._error = str(e)
