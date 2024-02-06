@@ -323,6 +323,9 @@ class Neknihy():
         self.backgroundTaskMonitor()
 
     def downloadBooks(self):
+        self.refreshBooks()
+        if self._error is not None:
+            return
         try:
             self.app.downloadBooks()
             self._error = None
