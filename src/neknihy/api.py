@@ -28,6 +28,7 @@ class API():
 
     def logout(self):
         self._login = None
+        self._rents = None
 
     def refreshListOfRentedBooks(self):
         headers = {
