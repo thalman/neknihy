@@ -53,9 +53,32 @@ class App():
         self.saveBooks()
         self.updateStatus()
 
+    def dateFromString(self, date):
+        try:
+            return datetime.fromisoformat(date)
+        except Exception:
+            pass
+        try:
+            y = None
+            m = None
+            d = None
+            if re.match(r'^\d{4}-\d{2}-\d{2}', date):
+                y = date[0:4]
+                m = date[5:7]
+                d = date[8:10]
+            if re.match(r'^\d{6}', date):
+                y = date[0:4]
+                m = date[4:6]
+                d = date[6:8]
+            if y is not None:
+                return datetime(int(y), int(m), int(d), tzinfo=timezone.utc)
+        except Exception:
+            pass
+        return datetime.now(timezone.utc)
+
     def bookExpired(self, book):
         if "end_time" in book:
-            time = datetime.fromisoformat(book["end_time"])
+            time = self.dateFromString(book["end_time"])
             if time < datetime.now(timezone.utc):
                 return True
         return False
