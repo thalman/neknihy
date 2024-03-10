@@ -12,6 +12,7 @@ BuildArch:      noarch
 
 BuildRequires:  python3-devel
 Requires:       python3-gobject
+Requires:       python3-tkinter
 
 %description
 Simple desktop client to PalmKnihy web rental system.
