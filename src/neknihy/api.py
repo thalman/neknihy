@@ -13,6 +13,10 @@ class API():
         if debug:
             HTTPConnection.debuglevel = 1
 
+    def responseDebug(self, response):
+        if HTTPConnection.debuglevel:
+            print("---response begin---\n%s\n---response end ---" % response.text)
+
     def login(self, email, password):
         if self._login:
             return
@@ -21,6 +25,7 @@ class API():
         response = requests.post(self._url + "/users/login/",
                                  data=json.dumps(data),
                                  headers=headers)
+        self.responseDebug(response)
         if response.status_code >= 300:
             raise RuntimeError("Nepodařilo se přihlásit, zkontrolujte jméno a heslo\n(%s)" %
                                response.text)
@@ -37,6 +42,7 @@ class API():
             "Authorization": "Bearer " + self._login["token"]
         }
         response = requests.get(self._url + "/rents/?refresh", headers=headers)
+        self.responseDebug(response)
         if response.status_code >= 300:
             raise RuntimeError("Nepodařilo se načíst seznam zapůjčených knih\n(%s)" %
                                response.text)
