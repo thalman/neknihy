@@ -174,25 +174,28 @@ class App():
         if not os.path.exists(self.settings.readerdir):
             return None
         result = {"added": [], "removed": [], "total": 0}
+        # add new books
         for i in range(len(self.books)):
             if self.books[i]["neknihy"]["status"] == "ok":
                 src = self.bookFile(i)
                 filename = self.books[i]["neknihy"]["filename"]
-                if self.settings.convert == "1":
+                ext = re.search("\\.[^.]+$", filename).group(0)
+                if self.settings.convert == "1" and ext == ".epub":
                     filename = re.sub(".epub$", ".mobi", filename)
                 dst = os.path.join(
                     self.settings.readerdir,
                     filename
                 )
                 if os.path.exists(src) and not os.path.exists(dst):
-                    if self.settings.convert == "1":
+                    if self.settings.convert == "1" and ext == ".epub":
                         subprocess.run([self.settings.convertor, src, dst])
                     else:
                         copy(src, dst)
                     result["added"].append(self.books[i]["neknihy"]["filename"])
                 result["total"] += 1
+        # remove expired books
         for fn in os.listdir(self.settings.readerdir):
-            if fn.lower().endswith("-palmknihy.epub") or fn.lower().endswith("-palmknihy.mobi"):
+            if re.search("-palmknihy.[a-z0-9]+$", fn.lower()):
                 if self.bookByFilename(fn) is None:
                     os.remove(os.path.join(self.settings.readerdir, fn))
                     result["removed"].append(fn)

@@ -2,6 +2,7 @@ import requests
 import json
 import urllib
 import os.path
+import re
 from http.client import HTTPConnection
 
 
@@ -76,13 +77,13 @@ class API():
         info = downloadInfo["file"]
         params = urllib.parse.parse_qs(info.split('?', 1)[1])
 
+        url = params["url"][0]
         ext = ".unknown"
-        if book["item_type"] == "ebook":
-            ext = ".epub"
-
+        match = re.search("\\.[^.]+$", url.split('?')[0])
+        if match:
+            ext = match.group(0).lower()
         filename = params["filename"][0] + ext
         fullpath = os.path.join(workdir, filename)
-        url = params["url"][0]
         response = requests.get(url, stream=True)
         with open(fullpath, 'wb') as f:
             for chunk in response.iter_content(chunk_size=10240):
