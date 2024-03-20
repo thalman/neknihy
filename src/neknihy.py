@@ -209,7 +209,7 @@ class Neknihy():
         # mobi convertor
         self._convert = tk.StringVar()
         checkbox = ttk.Checkbutton(p2,
-                                   text='Převádět na .mobi (pro Kindle)',
+                                   text='Převádět .epub na .mobi (pro Kindle)',
                                    variable=self._convert)
         checkbox.grid(column=1, row=4, columnspan=2, sticky=tk.EW, padx=5, pady=0)
         label = ttk.Label(p2, text="Cesta k ebook-convert")
