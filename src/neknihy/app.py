@@ -132,6 +132,20 @@ class App():
             return self.bookFileExists(index)
         return False
 
+    def bookAuthors(self, book):
+        authors = []
+        result = ""
+        try:
+            for person in book["persons"]:
+                if person["type"] == "author":
+                    full = person["author"]["firstname"] + " " + person["author"]["surname"]
+                    if full not in authors:
+                        authors.append(full)
+                        result += ", " + full
+        except Exception:
+            pass
+        return result[2:]
+
     def downloadBook(self, index):
         self.api.downloadBook(self.settings.workdir, self.books[index])
 
