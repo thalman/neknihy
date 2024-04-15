@@ -94,7 +94,7 @@ class Neknihy():
         self._window = tk.Tk()
         self._window.option_add('*Dialog.msg.font', 'Helvetica 12')
         self._window.title("Neknihy")
-        self._window.geometry("800x600")
+        self._window.geometry("1000x600")
         self._window.minsize(600, 400)
         self._icon = tk.PhotoImage(file=os.path.join(resources, 'neknihy.png'))
         self._window.iconphoto(True, self._icon)
@@ -162,13 +162,15 @@ class Neknihy():
         style = ttk.Style()
         style.configure('Treeview', font=(None, 10),
                         rowheight=int(10*2.5))
-        columns = ("book", "rent", "status")
+        columns = ("book", "author", "rent", "status")
         tree = ttk.Treeview(p1, columns=columns, show='headings')
         tree.pack(fill=tk.BOTH, expand=True)
         tree.heading("book", text='Kniha')
-        tree.column("book", minwidth=0, width=200)
+        tree.column("book", minwidth=0, width=300)
+        tree.heading("author", text='Autor')
+        tree.column("author", minwidth=0, width=150)
         tree.heading("rent", text='Výpůjčka do')
-        tree.column("rent", minwidth=0, width=100)
+        tree.column("rent", minwidth=0, width=150)
         tree.heading("status", text='Stav')
         tree.column("status", minwidth=0, width=400)
         self._tree = tree
@@ -291,6 +293,7 @@ class Neknihy():
                 tk.END,
                 values=(
                     book["title"],
+                    self.app.bookAuthors(book),
                     book["end_time"].split("T")[0] if "end_time" in book else "",
                     self.statusToText(book["neknihy"]["status"] if "neknihy" in book else "")
                 ))
