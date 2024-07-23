@@ -168,11 +168,11 @@ class Neknihy():
         tree.heading("book", text='Kniha')
         tree.column("book", minwidth=0, width=300)
         tree.heading("author", text='Autor')
-        tree.column("author", minwidth=0, width=150)
+        tree.column("author", minwidth=0, width=300)
         tree.heading("rent", text='Výpůjčka do')
         tree.column("rent", minwidth=0, width=150)
         tree.heading("status", text='Stav')
-        tree.column("status", minwidth=0, width=400)
+        tree.column("status", minwidth=0, width=250)
         self._tree = tree
 
         # settings page
