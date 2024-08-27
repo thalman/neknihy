@@ -30,7 +30,7 @@ najdete balíčky pro Fedora Linux, Window a MacOS.
 Ze sekce ["Releases"](https://github.com/thalman/neknihy/releases)
 si stáhnete balíček s aplikací na disk a nainstalujte ho
 
-	sudo dnf install ./neknihy*.rpm
+    sudo dnf install ./neknihy*.rpm
 
 ### Windows
 
@@ -58,6 +58,10 @@ Pokud máte nainstalovanou aplikaci [Calibre](https://calibre-ebook.com/),
 mohou Neknihy převést vypůjčenou publikaci do formátu `mobi` automaticky.
 V záložce `Nastavení` zatrhněte volbu `Převádět na .mobi` a vyplňte cestu
 k programu `ebook-convert` (součást Calibre).
+
+### Cesta k programu `ebook-convert` pro MacOS
+
+    /Applications/calibre.app/Contents/MacOS/ebook-convert
 
 ## Instalace ze zdrojových kódů
 
@@ -107,3 +111,26 @@ souboru z .py na .pyw:
 
 Aplikace připravena k použití, spustíte ji poklikáním na soubor neknihy.py nebo
 neknihy.pyw
+
+### MacOS (s procesory Intel i Apple Silicon (M1 a novější))
+
+Ze sekce ["Releases"](https://github.com/thalman/neknihy/releases)
+si stáhněte archiv se zdrojovým kódem. Nainstalujte python3 a knihovnu Tkniter. Doinstalujte závislosti a spusťte apliaci.
+
+#### Příklad instalace přes Homebrew
+
+    brew install python3
+    brew install python-tk
+    tar -xzf ./neknihy-${RELEASE}.tar.gz
+    ./neknihy-${RELEASE}/src/neknihy.py
+
+#### Příklad instalace přes Homebrew a python virtual environment
+
+    brew install python3
+    brew install python-tk
+    tar -xzf ./neknihy-${RELEASE}.tar.gz
+    cd ./neknihy-${RELEASE}
+    python -m venv venv
+    source venv/bin/activate
+    pip install -r src/REQUIREMENTS.txt
+    ./src/neknihy.py
