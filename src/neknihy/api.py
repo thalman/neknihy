@@ -69,6 +69,20 @@ class API():
                                response.text)
         return json.loads(response.text)
 
+    def fileExtension(self, response):
+        ftype = response.headers["Content-Type"]
+        if "/epub" in ftype:
+            return ".epub"
+        if "/pdf" in ftype:
+            return ".pdf"
+
+        fdisposition = response.headers["Content-Disposition"]
+        match = re.search('filename="[^"]+(\\.[^".]+)"', fdisposition)
+        if match:
+            return match.group(1).lower()
+
+        return ".unknown"
+
     def downloadBook(self, workdir, book):
         downloadInfo = self.getRentDownloadInfo(book)
         if not downloadInfo["status"]:
@@ -76,14 +90,13 @@ class API():
             return
         info = downloadInfo["file"]
         params = urllib.parse.parse_qs(info.split('?', 1)[1])
-
-        url = params["url"][0]
-        ext = ".unknown"
-        match = re.search("\\.[^.]+$", url.split('?')[0])
-        if match:
-            ext = match.group(0).lower()
-        filename = params["filename"][0] + ext
-        fullpath = os.path.join(workdir, filename)
+        basename = params["filename"][0]
+        if "url" in params and params["url"][0].lower().startswith("https://cdn.palmknihy.cz"):
+            # old way
+            url = params["url"][0]
+        else:
+            url = info
+        fullpath = os.path.join(workdir, basename + ".part")
         response = requests.get(url, stream=True)
         with open(fullpath, 'wb') as f:
             for chunk in response.iter_content(chunk_size=10240):
@@ -91,5 +104,7 @@ class API():
                     f.write(chunk)
         if response.status_code >= 300:
             raise RuntimeError("Nepodařilo se stáhnout knihu %s\n(%s)" %
-                               (filename, response.text))
-        book["neknihy"] = {"status": "ok", "filename": filename}
+                               (basename, response.text))
+        ext = self.fileExtension(response)
+        os.rename(fullpath, os.path.join(workdir, basename + ext))
+        book["neknihy"] = {"status": "ok", "filename": basename + ext}
