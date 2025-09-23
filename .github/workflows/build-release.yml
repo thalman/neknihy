@@ -20,7 +20,7 @@ jobs:
           git archive --format=tar.gz --prefix=neknihy-$APP_VERSION/ HEAD >neknihy-$APP_VERSION.tar.gz
           echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
       - name: Upload tar archive
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: tar
           path: neknihy-*.tar.gz
@@ -32,7 +32,7 @@ jobs:
     needs: create-archive
     steps:
       - name: Download tar
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tar
       - name: Install dependencies
@@ -49,7 +49,7 @@ jobs:
           rpmbuild -D "SRCVERSION $APP_VERSION" -D "_rpmdir $(pwd)/rpm" -ta neknihy-*.tar.gz
           mv rpm/noarch/*.rpm ./
       - name: Upload rpm
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: rpm
           path: neknihy-*.rpm
@@ -89,12 +89,12 @@ jobs:
         run: |
           sudo apt-get install --yes zip
       - name: Download exe
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: exe
           path: windows
       - name: Download macos
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: macos
           path: macos
@@ -111,13 +111,13 @@ jobs:
           zip -r ../neknihy-macos-$APP_VERSION.zip *
           popd
       - name: Upload win-zip archive
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: win-zip
           path: neknihy-win-*.zip
           retention-days: 5
       - name: Upload macos-zip archive
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos-zip
           path: neknihy-macos-*.zip
@@ -129,19 +129,19 @@ jobs:
     needs: [create-archive, build-rpm, repack-zip]
     steps:
       - name: Download tar
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tar
       - name: Download rpm
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: rpm
       - name: Download windows zip
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: win-zip
       - name: Download macos zip
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: macos-zip
       - name: Detect exact file names
