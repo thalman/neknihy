@@ -44,9 +44,7 @@ nainstalujte aplikaci ze zdrojových kódů.
 
 ### MacOS X
 
-Ze sekce ["Releases"](https://github.com/thalman/neknihy/releases)
-si stáhnete balíček (zip) pro MacOS na disk. Rozbalte ho a spusťte
-aplikaci neknihy.
+MacOS build je momentálně nedostupný. Instalujte pomocí homebrew (viz níže).
 
 ## Screenshot
 
