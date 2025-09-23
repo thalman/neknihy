@@ -61,7 +61,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Create Executable
-        uses: sayyid5416/pyinstaller@v1.3.0
+        uses: sayyid5416/pyinstaller@v1
         with:
           spec: 'src/neknihy.py'
           requirements: 'src/REQUIREMENTS.txt'
@@ -74,7 +74,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Create Executable
-        uses: sayyid5416/pyinstaller@v1.3.0
+        uses: sayyid5416/pyinstaller@v1
         with:
           spec: 'src/neknihy.py'
           requirements: 'src/REQUIREMENTS.txt'
