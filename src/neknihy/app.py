@@ -147,7 +147,8 @@ class App():
         return result[2:]
 
     def downloadBook(self, index):
-        self.api.downloadBook(self.settings.workdir, self.books[index])
+        if not self.bookExpired(self.books[index]):
+            self.api.downloadBook(self.settings.workdir, self.books[index])
 
     def downloadBooks(self):
         if not self.settings.configured():
